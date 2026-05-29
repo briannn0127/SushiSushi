@@ -16,7 +16,7 @@ export default class IngredientBox extends cc.Component implements IInteractable
     }
 
     public getInteractionPrompt(): string {
-        return "Press E to take " + this.itemId;
+        return "Press E to take " + this.getReadableItemName();
     }
 
     public canInteract(playerId: string, playerNode?: cc.Node): boolean {
@@ -45,5 +45,17 @@ export default class IngredientBox extends cc.Component implements IInteractable
         }
 
         return playerNode.getComponent(PlayerHand);
+    }
+
+    private getReadableItemName(): string {
+        if (this.displayName) {
+            return this.displayName.replace(" Box", "");
+        }
+
+        if (!this.itemId) {
+            return "";
+        }
+
+        return this.itemId.charAt(0).toUpperCase() + this.itemId.substr(1);
     }
 }

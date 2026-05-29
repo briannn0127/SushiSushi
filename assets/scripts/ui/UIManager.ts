@@ -56,6 +56,9 @@ export default class UIManager extends cc.Component {
     @property
     public orderWarningSeconds: number = 8;
 
+    @property
+    public prototypeTier: number = 1;
+
     private currentMoney: number = 0;
     private currentRemainingSeconds: number = 0;
     private completedOrders: number = 0;
@@ -189,6 +192,7 @@ export default class UIManager extends cc.Component {
             money: this.economyManager ? this.economyManager.getMoney() : this.currentMoney,
             remainingSeconds: this.timeManager ? this.timeManager.getRemainingSeconds() : this.currentRemainingSeconds,
             day: this.gameManager ? this.gameManager.getDay() : 1,
+            tier: this.prototypeTier,
             gameState: this.gameManager ? this.gameManager.getState() : GameState.Ready,
             playerHands: this.createPlayerHandModels(),
             interactableName: this.getCurrentInteractableName(),
@@ -215,10 +219,14 @@ export default class UIManager extends cc.Component {
 
     private createOrderModels(): OrderItemUIModel[] {
         if (!this.orderManager) {
-            return [];
+            return this.createPrototypeOrderModels();
         }
 
         var orders = this.orderManager.getActiveOrders();
+        if (orders.length === 0) {
+            return this.createPrototypeOrderModels();
+        }
+
         var models: OrderItemUIModel[] = [];
         var now = cc.director.getTotalTime() / 1000;
 
@@ -243,6 +251,28 @@ export default class UIManager extends cc.Component {
         }
 
         return models;
+    }
+
+    private createPrototypeOrderModels(): OrderItemUIModel[] {
+        return [
+            this.createPrototypeOrderModel("prototype-order-1", "Salmon Sushi", 45),
+            this.createPrototypeOrderModel("prototype-order-2", "Tuna Sushi", 60),
+            this.createPrototypeOrderModel("prototype-order-3", "Egg Sushi", 30),
+        ];
+    }
+
+    private createPrototypeOrderModel(orderId: string, sushiName: string, seconds: number): OrderItemUIModel {
+        return {
+            orderId: orderId,
+            customerName: "Customer",
+            sushiName: sushiName,
+            remainingWaitSeconds: seconds,
+            maxWaitSeconds: seconds,
+            satisfaction01: 1,
+            difficultyText: "Prototype",
+            qualityRequirementText: "Normal",
+            warning: seconds <= this.orderWarningSeconds,
+        };
     }
 
     private createDayResultModel(): DayResultUIModel {

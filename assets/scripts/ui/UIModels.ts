@@ -12,6 +12,7 @@ export interface HUDUIModel {
     money: number;
     remainingSeconds: number;
     day: number;
+    tier: number;
     gameState: GameState;
     playerHands: PlayerHandUIModel[];
     interactableName: string;

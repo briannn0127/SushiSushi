@@ -22,6 +22,12 @@ export default class HUDView extends cc.Component {
     @property(cc.Label)
     public gameStateLabel: cc.Label = null;
 
+    @property(cc.Label)
+    public tierLabel: cc.Label = null;
+
+    @property(cc.Label)
+    public dayTierDayLabel: cc.Label = null;
+
     private warnedFields: { [fieldName: string]: boolean } = {};
 
     public show(): void {
@@ -33,9 +39,11 @@ export default class HUDView extends cc.Component {
     }
 
     public updateView(model: HUDUIModel): void {
-        this.setLabel(this.moneyLabel, "Money: $" + model.money, "HUDView.moneyLabel");
+        this.setLabel(this.moneyLabel, "Money: " + model.money, "HUDView.moneyLabel");
         this.setLabel(this.timeLabel, "Time: " + this.formatTime(model.remainingSeconds), "HUDView.timeLabel");
         this.setLabel(this.dayLabel, "Day: " + model.day, "HUDView.dayLabel");
+        this.setLabel(this.dayTierDayLabel, "Day " + model.day, "HUDView.dayTierDayLabel");
+        this.setLabel(this.tierLabel, "Tier " + model.tier, "HUDView.tierLabel");
         this.setLabel(this.handItemLabel, "Hand: " + this.formatHands(model), "HUDView.handItemLabel");
         this.setLabel(this.interactableLabel, "Interact: " + (model.interactableName || "None"), "HUDView.interactableLabel");
         this.setLabel(this.gameStateLabel, "State: " + model.gameState, "HUDView.gameStateLabel");
@@ -44,6 +52,10 @@ export default class HUDView extends cc.Component {
     private formatHands(model: HUDUIModel): string {
         if (!model.playerHands || model.playerHands.length === 0) {
             return "Empty";
+        }
+
+        if (model.playerHands.length === 1) {
+            return model.playerHands[0].itemId || "Empty";
         }
 
         var parts: string[] = [];

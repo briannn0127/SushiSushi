@@ -21,6 +21,8 @@ export default class PauseMenuView extends cc.Component {
     @property(cc.Button)
     public settingsButton: cc.Button = null;
 
+    private buttonsBound: boolean = false;
+
     onLoad(): void {
         this.bindButtons();
         this.hide();
@@ -31,6 +33,7 @@ export default class PauseMenuView extends cc.Component {
     }
 
     public show(): void {
+        this.bindButtons();
         this.node.active = true;
         // TODO: Add fade in / scale pop animation.
     }
@@ -60,6 +63,10 @@ export default class PauseMenuView extends cc.Component {
     }
 
     private bindButtons(): void {
+        if (this.buttonsBound) {
+            this.unbindButtons();
+        }
+
         if (this.resumeButton) {
             this.resumeButton.node.on("click", this.onResumeClicked, this);
         }
@@ -75,9 +82,15 @@ export default class PauseMenuView extends cc.Component {
         if (this.settingsButton) {
             this.settingsButton.node.on("click", this.onSettingsClicked, this);
         }
+
+        this.buttonsBound = true;
     }
 
     private unbindButtons(): void {
+        if (!this.buttonsBound) {
+            return;
+        }
+
         if (this.resumeButton) {
             this.resumeButton.node.off("click", this.onResumeClicked, this);
         }
@@ -93,5 +106,7 @@ export default class PauseMenuView extends cc.Component {
         if (this.settingsButton) {
             this.settingsButton.node.off("click", this.onSettingsClicked, this);
         }
+
+        this.buttonsBound = false;
     }
 }
