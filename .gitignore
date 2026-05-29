@@ -22,3 +22,15 @@ yarn-error.log*
 
 # Build output
 dist/
+
+# Environment / local secrets
+.env
+.env.*
+
+# Test / coverage output
+coverage/
+
+# Archives
+*.zip
+*.rar
+*.7z
