@@ -1,0 +1,8 @@
+{
+  "name": "sushisushi",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Cocos Creator 2.4.8 sushi restaurant co-op management game prototype.",
+  "scripts": {},
+  "devDependencies": {}
+}
