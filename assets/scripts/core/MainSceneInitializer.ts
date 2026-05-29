@@ -38,6 +38,7 @@ export default class MainSceneInitializer extends cc.Component {
         var canvas = this.getOrCreateCanvas();
         var mainCamera = this.getOrCreateCamera(canvas);
         var gameRoot = this.getOrCreateChild(canvas, "GameRoot", cc.v2(0, 0), cc.size(this.canvasWidth, this.canvasHeight));
+        this.getOrCreateShopFloor(gameRoot);
         var managers = this.getOrCreateChild(gameRoot, "Managers", cc.v2(0, 0), cc.size(10, 10));
         var workstations = this.getOrCreateChild(gameRoot, "Workstations", cc.v2(0, 0), cc.size(this.canvasWidth, this.canvasHeight));
         var ingredientBoxes = this.getOrCreateChild(gameRoot, "IngredientBoxes", cc.v2(0, 0), cc.size(this.canvasWidth, this.canvasHeight));
@@ -118,11 +119,19 @@ export default class MainSceneInitializer extends cc.Component {
             cc.director.getScene().addChild(canvasNode);
         }
 
+        canvasNode.setAnchorPoint(0.5, 0.5);
+        canvasNode.setPosition(0, 0);
+        canvasNode.setScale(1, 1);
         var canvas = canvasNode.getComponent(cc.Canvas) || canvasNode.addComponent(cc.Canvas);
         canvas.designResolution = cc.size(this.canvasWidth, this.canvasHeight);
         canvas.fitHeight = true;
         canvas.fitWidth = true;
         canvasNode.setContentSize(this.canvasWidth, this.canvasHeight);
+
+        var widget = canvasNode.getComponent(cc.Widget);
+        if (widget) {
+            widget.enabled = false;
+        }
         return canvasNode;
     }
 
@@ -135,9 +144,22 @@ export default class MainSceneInitializer extends cc.Component {
 
         cameraNode.setPosition(0, 0);
         var camera = cameraNode.getComponent(cc.Camera) || cameraNode.addComponent(cc.Camera);
-        camera.backgroundColor = cc.Color.BLACK;
+        camera.backgroundColor = cc.color(28, 31, 35, 255);
         camera.clearFlags = cc.Camera.ClearFlags.COLOR;
         return cameraNode;
+    }
+
+    private getOrCreateShopFloor(parent: cc.Node): cc.Node {
+        var floor = this.getOrCreateChild(parent, "ShopFloor", cc.v2(0, -18), cc.size(980, 520));
+        floor.zIndex = -100;
+        this.drawRect(floor, cc.color(52, 58, 62, 255), 980, 520);
+
+        var counter = this.getOrCreateChild(floor, "CounterArea", cc.v2(0, 170), cc.size(900, 92));
+        this.drawRect(counter, cc.color(87, 75, 62, 255), 900, 92);
+
+        var prep = this.getOrCreateChild(floor, "PrepArea", cc.v2(0, -38), cc.size(900, 300));
+        this.drawRect(prep, cc.color(64, 70, 74, 255), 900, 300);
+        return floor;
     }
 
     private getOrCreatePlayer(parent: cc.Node): cc.Node {
@@ -150,14 +172,14 @@ export default class MainSceneInitializer extends cc.Component {
         player.setPosition(-40, 0);
         player.setContentSize(48, 48);
         this.drawRect(player, cc.color(60, 130, 255, 255), 48, 48);
-        this.getOrCreateLabel(player, "PlayerNameLabel", "Player", cc.v2(0, 42), 18);
+        this.centerLabel(this.getOrCreateLabel(player, "PlayerNameLabel", "Player", cc.v2(-42, 42), 18), 84);
         return player;
     }
 
     private getOrCreateIngredientBox(parent: cc.Node, nodeName: string, itemId: string, displayName: string, position: cc.Vec2): cc.Node {
         var node = this.getOrCreateChild(parent, nodeName, position, cc.size(96, 64));
         this.drawRect(node, cc.color(245, 210, 95, 255), 96, 64);
-        this.getOrCreateLabel(node, "NameLabel", displayName, cc.v2(0, 0), 18);
+        this.centerLabel(this.getOrCreateLabel(node, "NameLabel", displayName, cc.v2(-48, 0), 18), 96);
 
         var box = this.getOrAdd(node, IngredientBox);
         box.itemId = itemId;
@@ -168,7 +190,7 @@ export default class MainSceneInitializer extends cc.Component {
     private getOrCreateWorkstation(parent: cc.Node, nodeName: string, displayName: string, prompt: string, position: cc.Vec2): cc.Node {
         var node = this.getOrCreateChild(parent, nodeName, position, cc.size(130, 74));
         this.drawRect(node, cc.color(130, 130, 130, 255), 130, 74);
-        this.getOrCreateLabel(node, "NameLabel", displayName, cc.v2(0, 0), 18);
+        this.centerLabel(this.getOrCreateLabel(node, "NameLabel", displayName, cc.v2(-65, 0), 18), 130);
 
         var station = this.getOrAdd(node, Workstation);
         station.workstationId = nodeName;
@@ -181,34 +203,34 @@ export default class MainSceneInitializer extends cc.Component {
         var hudPanel = this.getOrCreateChild(uiRoot, "HUDPanel", cc.v2(0, 0), cc.size(this.canvasWidth, this.canvasHeight));
         var hud = this.getOrAdd(hudPanel, HUDView);
 
-        hud.gameStateLabel = this.getOrCreateLabel(hudPanel, "GameStateLabel", "State: Ready", cc.v2(-560, 320), 22);
-        hud.moneyLabel = this.getOrCreateLabel(hudPanel, "MoneyLabel", "Money: $0", cc.v2(-560, 288), 22);
-        hud.timeLabel = this.getOrCreateLabel(hudPanel, "TimeLabel", "Time: 0:00", cc.v2(-560, 256), 22);
-        hud.dayLabel = this.getOrCreateLabel(hudPanel, "DayLabel", "Day: 1", cc.v2(-560, 224), 22);
-        hud.handItemLabel = this.getOrCreateLabel(hudPanel, "HandItemLabel", "Hand: Empty", cc.v2(-560, 192), 22);
-        hud.interactableLabel = this.getOrCreateLabel(hudPanel, "InteractableLabel", "Interact: None", cc.v2(-560, 160), 22);
-        hud.dayTierDayLabel = this.getOrCreateLabel(hudPanel, "DayTierDayLabel", "Day 1", cc.v2(500, 320), 24);
-        hud.tierLabel = this.getOrCreateLabel(hudPanel, "TierLabel", "Tier 1", cc.v2(500, 288), 24);
+        hud.gameStateLabel = this.getOrCreateLabel(hudPanel, "GameStateLabel", "State: Ready", cc.v2(-596, 326), 20);
+        hud.moneyLabel = this.getOrCreateLabel(hudPanel, "MoneyLabel", "Money: 0", cc.v2(-596, 296), 20);
+        hud.timeLabel = this.getOrCreateLabel(hudPanel, "TimeLabel", "Time: 03:00", cc.v2(-596, 266), 20);
+        hud.dayLabel = this.getOrCreateLabel(hudPanel, "DayLabel", "Day: 1", cc.v2(-596, 236), 20);
+        hud.handItemLabel = this.getOrCreateLabel(hudPanel, "HandItemLabel", "Hand: Empty", cc.v2(-596, 206), 20);
+        hud.interactableLabel = this.getOrCreateLabel(hudPanel, "InteractableLabel", "Interact: None", cc.v2(-596, 176), 20);
+        hud.dayTierDayLabel = this.getOrCreateLabel(hudPanel, "DayTierDayLabel", "Day 1", cc.v2(500, 326), 24);
+        hud.tierLabel = this.getOrCreateLabel(hudPanel, "TierLabel", "Tier 1", cc.v2(500, 294), 24);
 
-        this.alignTopLeft(hud.gameStateLabel.node, 24, 18);
-        this.alignTopLeft(hud.moneyLabel.node, 24, 50);
-        this.alignTopLeft(hud.timeLabel.node, 24, 82);
-        this.alignTopLeft(hud.dayLabel.node, 24, 114);
-        this.alignTopLeft(hud.handItemLabel.node, 24, 146);
-        this.alignTopLeft(hud.interactableLabel.node, 24, 178);
-        this.alignTopRight(hud.dayTierDayLabel.node, 24, 18);
-        this.alignTopRight(hud.tierLabel.node, 24, 50);
+        this.prepareTopLeftLabel(hud.gameStateLabel.node, 240);
+        this.prepareTopLeftLabel(hud.moneyLabel.node, 240);
+        this.prepareTopLeftLabel(hud.timeLabel.node, 240);
+        this.prepareTopLeftLabel(hud.dayLabel.node, 240);
+        this.prepareTopLeftLabel(hud.handItemLabel.node, 280);
+        this.prepareTopLeftLabel(hud.interactableLabel.node, 300);
+        this.prepareTopRightLabel(hud.dayTierDayLabel.node, 150);
+        this.prepareTopRightLabel(hud.tierLabel.node, 150);
         return hud;
     }
 
     private getOrCreateOrderPanel(uiRoot: cc.Node): OrderListView {
-        var panel = this.getOrCreateChild(uiRoot, "OrderPanel", cc.v2(-510, 48), cc.size(260, 210));
-        this.drawRect(panel, cc.color(0, 0, 0, 110), 260, 210);
-        this.alignTopLeft(panel, 24, 220);
+        var panel = this.getOrCreateChild(uiRoot, "OrderPanel", cc.v2(-498, 28), cc.size(284, 192));
+        this.drawRect(panel, cc.color(18, 21, 24, 210), 284, 192);
 
         var view = this.getOrAdd(panel, OrderListView);
-        view.titleLabel = this.getOrCreateLabel(panel, "TitleLabel", "Orders", cc.v2(-108, 78), 24);
-        view.contentRoot = this.getOrCreateChild(panel, "Content", cc.v2(-2, 38), cc.size(230, 150));
+        view.titleLabel = this.getOrCreateLabel(panel, "TitleLabel", "Orders", cc.v2(-126, 72), 24);
+        view.contentRoot = this.getOrCreateChild(panel, "Content", cc.v2(0, 34), cc.size(240, 130));
+        this.prepareTopLeftLabel(view.titleLabel.node, 180);
         return view;
     }
 
@@ -217,8 +239,10 @@ export default class MainSceneInitializer extends cc.Component {
         this.drawRect(panel, cc.color(0, 0, 0, 150), 640, 48);
         var view = this.getOrAdd(panel, InteractionPromptView);
         view.promptLabel = this.getOrCreateLabel(panel, "PromptLabel", "", cc.v2(0, 0), 24);
+        view.promptLabel.node.setAnchorPoint(0.5, 0.5);
+        view.promptLabel.node.setContentSize(640, 34);
         view.promptLabel.horizontalAlign = cc.Label.HorizontalAlign.CENTER;
-        this.alignBottomCenter(panel, 0, 24);
+        panel.setPosition(0, -316);
         panel.active = false;
         return view;
     }
@@ -228,7 +252,7 @@ export default class MainSceneInitializer extends cc.Component {
         this.drawRect(panel, cc.color(0, 0, 0, 190), 360, 300);
 
         var view = this.getOrAdd(panel, PauseMenuView);
-        this.getOrCreateLabel(panel, "PausedTitleLabel", "PAUSED", cc.v2(-48, 104), 32);
+        this.centerLabel(this.getOrCreateLabel(panel, "PausedTitleLabel", "PAUSED", cc.v2(-100, 104), 32), 200);
         view.resumeButton = this.getOrCreateButton(panel, "ResumeButton", "Resume", cc.v2(0, 44));
         view.restartDayButton = this.getOrCreateButton(panel, "RestartDayButton", "Restart Day", cc.v2(0, -16));
         view.mainMenuButton = this.getOrCreateButton(panel, "MainMenuButton", "Main Menu", cc.v2(0, -76));
@@ -256,6 +280,7 @@ export default class MainSceneInitializer extends cc.Component {
         }
 
         node.setPosition(position);
+        node.setAnchorPoint(0, 0.5);
         node.setContentSize(420, 32);
         var label = node.getComponent(cc.Label) || node.addComponent(cc.Label);
         label.string = text;
@@ -296,6 +321,31 @@ export default class MainSceneInitializer extends cc.Component {
 
     private getOrAdd<T extends cc.Component>(node: cc.Node, componentClass: any): T {
         return node.getComponent(componentClass) || node.addComponent(componentClass);
+    }
+
+    private prepareTopLeftLabel(node: cc.Node, width: number): void {
+        node.setAnchorPoint(0, 0.5);
+        node.setContentSize(width, 30);
+        this.disableWidget(node);
+    }
+
+    private prepareTopRightLabel(node: cc.Node, width: number): void {
+        node.setAnchorPoint(0, 0.5);
+        node.setContentSize(width, 32);
+        this.disableWidget(node);
+    }
+
+    private disableWidget(node: cc.Node): void {
+        var widget = node.getComponent(cc.Widget);
+        if (widget) {
+            widget.enabled = false;
+        }
+    }
+
+    private centerLabel(label: cc.Label, width: number): void {
+        label.node.setAnchorPoint(0, 0.5);
+        label.node.setContentSize(width, label.node.height);
+        label.horizontalAlign = cc.Label.HorizontalAlign.CENTER;
     }
 
     private alignTopLeft(node: cc.Node, left: number, top: number): void {
